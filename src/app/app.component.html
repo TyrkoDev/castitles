@@ -1,0 +1,11 @@
+<div id="player" class="content">
+    <!-- Video Controls -->
+    <div class="controls">
+        <!-- Timer -->
+        <app-time-slider [video]="videoElement"></app-time-slider>
+        <!-- Other controls -->
+        <app-controls (video)="loadVideo($event)" (subtitles)="loadSubtitles($event)"></app-controls>
+    </div>
+</div>
+
+

@@ -1,0 +1,15 @@
+.slider-time {
+  width: 99.9%;
+  bottom: 0;
+  position: fixed;
+  margin-bottom: 2.5rem;
+}
+
+:host ::ng-deep .mat-slider-horizontal .mat-slider-track-background,
+:host ::ng-deep .mat-slider-horizontal .mat-slider-track-fill,
+:host ::ng-deep .mat-slider-horizontal .mat-slider-track-wrapper,
+:host ::ng-deep .mat-slider-horizontal .mat-slider-wrapper,
+:host ::ng-deep .mat-slider-horizontal .mat-slider-ticks-container,
+:host ::ng-deep .mat-slider-horizontal .mat-slider-ticks {
+  height: 5px !important;
+}

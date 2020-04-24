@@ -1,0 +1,17 @@
+{
+  "name": "Castitles",
+  "version": "1.0",
+  "description": "Allow to cast video with subtitles",
+  "permissions": ["activeTab"],
+  "icons": { 
+    "128" : "icon128.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "title": "Open Castitles"
+  },
+  "manifest_version": 2
+}

@@ -1,0 +1,45 @@
+<mat-toolbar>
+    <!-- Play -->
+    <button mat-button aria-label="Play" (click)="pause()">
+        <mat-icon *ngIf="isPaused">play_arrow</mat-icon>
+        <mat-icon *ngIf="!isPaused">pause</mat-icon>
+    </button>
+
+    <!-- Mute-->
+    <button mat-button aria-label="Mute" (click)="mute()">
+        <mat-icon *ngIf="!isMute">volume_up</mat-icon>
+        <mat-icon *ngIf="isMute">volume_off</mat-icon>
+    </button>
+
+    <!-- Volume -->
+    <mat-slider
+        [max]="10"
+        [min]="0"
+        [step]="0.5"
+        [value]="10"
+        (change)="volume($event)"
+        [vertical]="false">
+    </mat-slider>
+
+    <!-- Timer -->
+    <p>{{currentTime}} / {{totalDuration}}</p>
+
+    <span class="spacer"></span>
+
+    <!-- Pick movie -->
+    <button type="button" mat-button (click)="videoInput.click()">
+        <mat-icon>movie</mat-icon>
+    </button>
+    <input hidden (change)="loadVideo($event)" #videoInput type="file" accept="*" id="video">
+
+    <!-- Pick subtitles -->
+    <button type="button" mat-button (click)="subtitlesInput.click()">
+        <mat-icon>subtitles</mat-icon>
+    </button>
+    <input hidden (change)="loadSubtitles($event)" #subtitlesInput type="file" accept="*" id="subtitles">
+
+    <!-- Fullscreen -->
+    <button mat-button aria-label="Fullscreen" (click)="fullscreen()">
+        <mat-icon>fullscreen</mat-icon>
+    </button>
+</mat-toolbar>

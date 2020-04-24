@@ -1,0 +1,16 @@
+mat-toolbar {
+  position: absolute;
+  bottom: 0;
+  background: none;
+  color: white;
+  z-index: 10;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+p {
+  margin-left: 1%;
+  margin-bottom: 0;
+}
