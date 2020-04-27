@@ -1,4 +1,8 @@
 <div id="player" class="content">
+    <div class="advice-player" *ngIf="videoElement === undefined">
+        <h1>To open a video, click on <mat-icon>movie</mat-icon></h1>
+        <h1>To add subtitles, click on <mat-icon>subtitles</mat-icon></h1>
+    </div>
     <!-- Video Controls -->
     <div class="controls">
         <!-- Timer -->
