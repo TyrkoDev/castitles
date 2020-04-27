@@ -49,3 +49,23 @@ video::-webkit-media-controls-enclosure {
 ::ng-deep .mat-accent .mat-slider-track-fill {
   background-color: white;
 }
+
+.advice-player {
+  color: white;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 0.5;
+}
+
+mat-icon {
+  vertical-align: middle;
+}
+
+hr {
+  color: white;
+  width: 50%;
+  margin-bottom: 18px;
+}

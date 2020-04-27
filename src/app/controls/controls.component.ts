@@ -1,7 +1,10 @@
-import { Component, Output, EventEmitter, HostListener, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import VTTConverter from 'srt-webvtt';
 import { MatSlider } from '@angular/material/slider';
 import { Time } from '../shared/time';
+import { MatSnackBar, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
+import { AdviceComponent } from '../advice/advice.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-controls',
@@ -21,6 +24,9 @@ export class ControlsComponent implements OnInit {
 
   @Output() video: EventEmitter<any> = new EventEmitter();
   @Output() subtitles: EventEmitter<any> = new EventEmitter();
+
+
+  constructor(private _snackBar: MatSnackBar, private titleService: Title) {}
 
   ngOnInit(): void {
     document.addEventListener('fullscreenchange', () => {
@@ -71,7 +77,7 @@ export class ControlsComponent implements OnInit {
     if (file.target.files && file.target.files[0]) {
       this.createVideoElement(file.target.files[0]);
     } else {
-      console.error("Impossible de lire le fichier video");
+      this.toast(5000, 'An error occured trying to open video');
     }
   }
 
@@ -79,7 +85,7 @@ export class ControlsComponent implements OnInit {
     if (file.target.files && file.target.files[0]) {
       this.createSubtitlesElement(file.target.files[0]);
     } else {
-      console.error("Impossible de lire le fichier de sous-titres");
+      this.toast(5000, 'An error occured trying to add subtitles');
     }
   }
 
@@ -87,7 +93,14 @@ export class ControlsComponent implements OnInit {
     this.videoElement = document.createElement('video');
     this.videoElement.src = URL.createObjectURL(file);
     this.videoElement.setAttribute('type', 'video/mp4');
+    this.videoElement.onerror = () => {
+      this.videoElement.error.code === 4 ? this.toast(5000, 'Video not supported') : this.toast(5000, 'Unknown error occured while loading video');
+    }
     this.video.emit(this.videoElement);
+    if (this.subtitlesElement !== undefined) {
+      this.subtitles.emit(this.subtitlesElement);
+    }
+
     this.isPaused = false;
     this.setupTimer();
     this.videoElement.ondurationchange = () => {
@@ -99,6 +112,9 @@ export class ControlsComponent implements OnInit {
     this.videoElement.addEventListener('click', (e) => {
       this.pause();
     });
+
+    this.toast(3000, file.name);
+    this.titleService.setTitle('Castitles - ' + file.name);
   }
 
   private setupTimer() {
@@ -118,10 +134,23 @@ export class ControlsComponent implements OnInit {
         this.subtitlesElement.label = "English";
         this.subtitlesElement.srclang = "en";
         this.subtitlesElement.src = url;
-        this.subtitles.emit(this.subtitlesElement);
+
+        if (this.videoElement !== undefined) {
+          this.subtitles.emit(this.subtitlesElement);
+        }
+
+        this.toast(2000, 'Subtitles loaded');
       })
       .catch((err) => {
         console.error(err);
       });
+  }
+
+  public toast(duration: number, data: any): void  {
+    this._snackBar.openFromComponent(AdviceComponent, {
+      duration: duration,
+      data: data,
+      verticalPosition: <MatSnackBarVerticalPosition>'top'
+    });
   }
 }
