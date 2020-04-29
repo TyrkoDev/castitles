@@ -39,6 +39,12 @@
     <input hidden (change)="loadSubtitles($event)" #subtitlesInput type="file" accept="*" id="subtitles">
 
     <!-- Fullscreen -->
+    <button mat-button aria-label="Cast" (click)="cast()">
+        <mat-icon *ngIf="!statusCast">cast</mat-icon>
+        <mat-icon *ngIf="statusCast">cast_connected</mat-icon>
+    </button>
+
+    <!-- Fullscreen -->
     <button mat-button aria-label="Fullscreen" (click)="fullscreen()">
         <mat-icon>fullscreen</mat-icon>
     </button>

@@ -5,6 +5,7 @@ import { Time } from '../shared/time';
 import { MatSnackBar, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { AdviceComponent } from '../advice/advice.component';
 import { Title } from '@angular/platform-browser';
+import { CastService } from '../service/cast/cast.service';
 
 @Component({
   selector: 'app-controls',
@@ -26,12 +27,18 @@ export class ControlsComponent implements OnInit {
   @Output() subtitles: EventEmitter<any> = new EventEmitter();
 
 
-  constructor(private _snackBar: MatSnackBar, private titleService: Title) {}
+  constructor(private _snackBar: MatSnackBar, private titleService: Title, private castService: CastService) {}
 
   ngOnInit(): void {
+    this.castService.initializeCastApi();
+    this.castService.getStatus().subscribe(status => {
+      this.statusCast = status;
+    });
+
     document.addEventListener('fullscreenchange', () => {
       this.isFullscreen = !this.isFullscreen;
     });
+
     document.body.onkeyup = (e) => {
       e.preventDefault();
       if (e.keyCode == 32) {
@@ -58,6 +65,10 @@ export class ControlsComponent implements OnInit {
       this.videoElement.muted = true;
       this.isMute = true;
     }
+  }
+
+  public cast() {
+    this.castService.discoverDevices();
   }
 
   public fullscreen(): void {
@@ -102,6 +113,13 @@ export class ControlsComponent implements OnInit {
     }
 
     this.isPaused = false;
+
+    console.log(this.videoElement.src);
+    console.log(file.type);
+    if (this.statusCast && file.type === 'video/mp4') {
+      this.castService.launchMedia(this.videoElement.src);
+    }
+
     this.setupTimer();
     this.videoElement.ondurationchange = () => {
       this.totalDuration = Time.timeToString(this.videoElement.duration);

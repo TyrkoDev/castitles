@@ -5,19 +5,22 @@ declare var cast, chrome: any;
 
 @Injectable()
 export class CastService {
+  // Casting session
   private cast;
+  // Is connected to device
   private status : BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor() {}
 
-  initializeCastApi() {
+  initializeCastApi(): void {
     const sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
     const apiConfig = new chrome.cast.ApiConfig(sessionRequest,
-      function(session) {
+      (session) => {
         console.log('got session', session)
         this.cast = session
+        this.status.next(true);
       },
-      function(e) {
+      (e) => {
         if (e === chrome.cast.ReceiverAvailability.AVAILABLE) {
           console.log('receiver is available :)')
         }
@@ -26,21 +29,12 @@ export class CastService {
     chrome.cast.initialize(apiConfig, 
       () => console.log('got initSuccess'),
       (gotError) => console.log('gotError', gotError));
-  };
-
-  public onInitSuccess(e) {
-    console.log('GCast initialization success');
-  }
-
-  public onError(err) {
-    console.log('GCast initialization failed', err);
   }
 
   public discoverDevices(): void {
     const sessionRequest = new chrome.cast.SessionRequest(chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID);
     chrome.cast.requestSession(
       (s) => {
-        console.log(s);
         this.cast = s;
         this.status.next(true);
       }, 
