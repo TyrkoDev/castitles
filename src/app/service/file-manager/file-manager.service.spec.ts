@@ -1,16 +1,16 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, inject } from '@angular/core/testing';
-import { CastService } from './cast.service';
+import { FileManagerService } from './file-manager.service';
 
 describe('NgCastService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CastService]
+      providers: [FileManagerService]
     });
   });
 
-  it('should ...', inject([CastService], (service: CastService) => {
+  it('should ...', inject([FileManagerService], (service: FileManagerService) => {
     expect(service).toBeTruthy();
   }));
 });

@@ -5,6 +5,11 @@
         <mat-icon *ngIf="!isPaused">pause</mat-icon>
     </button>
 
+    <!-- Stop -->
+    <button mat-button aria-label="Play" (click)="stop()">
+        <mat-icon>stop</mat-icon>
+    </button>
+
     <!-- Mute-->
     <button mat-button aria-label="Mute" (click)="mute()">
         <mat-icon *ngIf="!isMute">volume_up</mat-icon>
@@ -40,8 +45,8 @@
 
     <!-- Fullscreen -->
     <button mat-button aria-label="Cast" (click)="cast()">
-        <mat-icon *ngIf="!statusCast">cast</mat-icon>
-        <mat-icon *ngIf="statusCast">cast_connected</mat-icon>
+        <mat-icon *ngIf="!connected()">cast</mat-icon>
+        <mat-icon *ngIf="connected()">cast_connected</mat-icon>
     </button>
 
     <!-- Fullscreen -->

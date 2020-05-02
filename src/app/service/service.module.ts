@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CastService } from './cast/cast.service';
+import { FileManagerService } from './file-manager/file-manager.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
@@ -8,6 +8,6 @@ import { MatIconModule } from '@angular/material/icon';
     CommonModule,
     MatIconModule
   ],
-  providers: [CastService]
+  providers: [FileManagerService]
 })
 export class ServiceModule { }

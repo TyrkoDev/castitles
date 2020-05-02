@@ -1,14 +1,17 @@
 <div id="player" class="content">
-    <div class="advice-player" *ngIf="videoElement === undefined">
+    <div class="advice-player" *ngIf="videoElement === undefined && device === undefined">
         <h1>To open a video, click on <mat-icon>movie</mat-icon></h1>
         <h1>To add subtitles, click on <mat-icon>subtitles</mat-icon></h1>
+    </div>
+    <div class="advice-player" *ngIf="device">
+        <h1>Currently casting on device : {{device}}</h1>
     </div>
     <!-- Video Controls -->
     <div class="controls">
         <!-- Timer -->
         <app-time-slider [video]="videoElement"></app-time-slider>
         <!-- Other controls -->
-        <app-controls (video)="loadVideo($event)" (subtitles)="loadSubtitles($event)"></app-controls>
+        <app-controls (video)="loadVideo($event)" (subtitles)="loadSubtitles($event)" (deviceEmit)="cast($event)"></app-controls>
     </div>
 </div>
 

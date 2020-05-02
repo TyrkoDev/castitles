@@ -5,7 +5,10 @@ import { Time } from '../shared/time';
 import { MatSnackBar, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 import { AdviceComponent } from '../advice/advice.component';
 import { Title } from '@angular/platform-browser';
-import { CastService } from '../service/cast/cast.service';
+import { FileManagerService } from '../service/file-manager/file-manager.service';
+import { ControlsService } from './controls.service';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { DialogDeviceCastComponent } from '../dialog-device-cast/dialog-device-cast.component';
 
 @Component({
   selector: 'app-controls',
@@ -15,24 +18,32 @@ import { CastService } from '../service/cast/cast.service';
 export class ControlsComponent implements OnInit {
   public videoElement: any;
   public subtitlesElement: any;
+  public videoFile: string = undefined;
+  public subtitlesFile: string = undefined;
 
+  public device: string;
   public isPaused: boolean = true;
   public isMute: boolean = false;
   public isFullscreen: boolean = false;
-  public statusCast: boolean = false;
   public currentTime: String = "00:00:00";
   public totalDuration: String = "00:00:00";
 
   @Output() video: EventEmitter<any> = new EventEmitter();
   @Output() subtitles: EventEmitter<any> = new EventEmitter();
+  @Output() deviceEmit: EventEmitter<string> = new EventEmitter();
 
 
-  constructor(private _snackBar: MatSnackBar, private titleService: Title, private castService: CastService) {}
+  constructor(private _snackBar: MatSnackBar, 
+    private titleService: Title, 
+    private fileManagerService: FileManagerService,
+    private controlsService: ControlsService,
+    private _bottomSheet: MatBottomSheet) {}
 
   ngOnInit(): void {
-    this.castService.initializeCastApi();
-    this.castService.getStatus().subscribe(status => {
-      this.statusCast = status;
+    this.controlsService.getDevice().subscribe((device) => {
+      if (device !== undefined) {
+        this.device = device;
+      }
     });
 
     document.addEventListener('fullscreenchange', () => {
@@ -49,11 +60,28 @@ export class ControlsComponent implements OnInit {
 
   public pause(): void {
     if (this.isPaused) {
-      this.videoElement.play();
-      this.isPaused = false;
+      if (this.connected()) {
+        this.controlsService.play().subscribe(() => this.isPaused = false);
+      } else {
+        this.videoElement.play();
+        this.isPaused = false;
+      }
     } else {
-      this.videoElement.pause();
-      this.isPaused = true;
+      if (this.connected()) {
+        this.controlsService.pause().subscribe(() => this.isPaused = true);
+      } else {
+        this.videoElement.pause();
+        this.isPaused = true;
+      }
+    }
+  }
+
+  public stop(): void {
+    if (this.connected()) {
+      this.controlsService.stop().subscribe(() => {
+        this.device = undefined;
+        this.deviceEmit.emit();
+      });
     }
   }
 
@@ -67,8 +95,25 @@ export class ControlsComponent implements OnInit {
     }
   }
 
-  public cast() {
-    this.castService.discoverDevices();
+  public cast(): void {
+    if (!this.connected()) {
+      this.controlsService.getDevices().subscribe(devices => {
+        const dialog = this._bottomSheet.open(DialogDeviceCastComponent, {
+          data: devices
+        });
+        dialog.afterDismissed().subscribe(device => {
+          this.device = device;
+          this.controlsService.chooseDevice(device).subscribe(() => this.deviceEmit.emit(device));
+        });
+      });
+    } else {
+      this.deviceEmit.emit();
+      this.device = undefined;
+    }
+  }
+
+  public connected(): boolean {
+    return this.device !== undefined && this.device !== null && this.device !== '';
   }
 
   public fullscreen(): void {
@@ -100,7 +145,23 @@ export class ControlsComponent implements OnInit {
     }
   }
 
+  private initControls() {
+    this.isPaused = false;
+    this.setupTimer();
+    this.toast(3000, this.videoFile);
+    this.titleService.setTitle('Castitles - ' + this.videoFile);
+  }
+
   private createVideoElement(file: any) {
+    this.videoFile = file.name;
+    if (this.connected()) {
+      this.fileManagerService.uploadFile(file).subscribe(() => {
+        this.subtitlesFile !== undefined ? 
+        this.controlsService.launchMediaWithSubtitles(file.name, this.subtitlesFile, 0).subscribe(() => this.initControls()) :
+        this.controlsService.launchMedia(file.name).subscribe(() => this.initControls());
+      });
+    }
+      
     this.videoElement = document.createElement('video');
     this.videoElement.src = URL.createObjectURL(file);
     this.videoElement.setAttribute('type', 'video/mp4');
@@ -112,15 +173,8 @@ export class ControlsComponent implements OnInit {
       this.subtitles.emit(this.subtitlesElement);
     }
 
-    this.isPaused = false;
+    this.initControls();
 
-    console.log(this.videoElement.src);
-    console.log(file.type);
-    if (this.statusCast && file.type === 'video/mp4') {
-      this.castService.launchMedia(this.videoElement.src);
-    }
-
-    this.setupTimer();
     this.videoElement.ondurationchange = () => {
       this.totalDuration = Time.timeToString(this.videoElement.duration);
     };
@@ -130,19 +184,25 @@ export class ControlsComponent implements OnInit {
     this.videoElement.addEventListener('click', (e) => {
       this.pause();
     });
-
-    this.toast(3000, file.name);
-    this.titleService.setTitle('Castitles - ' + file.name);
   }
 
   private setupTimer() {
     setInterval(() => {
-      this.currentTime = Time.timeToString(this.videoElement.currentTime);
+      this.currentTime = this.connected() ? '--:--:--' : Time.timeToString(this.videoElement.currentTime);
     }, 1000);
   }
 
   private createSubtitlesElement(file: any) {
     const vttConverter = new VTTConverter(file);
+    this.subtitlesFile = file.name;
+    
+    if (this.connected()) {
+      this.fileManagerService.uploadFile(file).subscribe(() => {
+        if (this.videoElement !== undefined) {
+          this.controlsService.launchMediaWithSubtitles(this.videoFile, this.subtitlesFile, 0).subscribe();
+        }
+      });
+    }
 
     vttConverter
       .getURL()

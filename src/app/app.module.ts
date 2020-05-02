@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatListModule } from '@angular/material/list';
 import { ServiceModule } from './service/service.module';
 import { SharedModule } from './shared/shared.module';
 
@@ -14,13 +16,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ControlsComponent } from './controls/controls.component';
 import { TimeSliderComponent } from './time-slider/time-slider.component';
 import { AdviceComponent } from './advice/advice.component';
+import { ControlsService } from './controls/controls.service';
+import { DialogDeviceCastComponent } from './dialog-device-cast/dialog-device-cast.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ControlsComponent,
     TimeSliderComponent,
-    AdviceComponent
+    AdviceComponent,
+    DialogDeviceCastComponent
   ],
   imports: [
     BrowserModule,
@@ -32,9 +37,11 @@ import { AdviceComponent } from './advice/advice.component';
     MatToolbarModule,
     ServiceModule,
     SharedModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatBottomSheetModule,
+    MatListModule
   ],
-  providers: [],
+  providers: [ControlsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

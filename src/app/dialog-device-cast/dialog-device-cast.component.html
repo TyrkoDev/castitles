@@ -1,0 +1,8 @@
+<mat-nav-list>
+    <div *ngFor="let device of devices" mat-list-item>
+        <button type="button" mat-button mat-line (click)="chooseDevice(device)">
+            {{device}}
+        </button>
+    </div>
+  </mat-nav-list>
+  
