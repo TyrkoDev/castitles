@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class ControlsService {
@@ -9,7 +10,7 @@ export class ControlsService {
   constructor(private httpServer: HttpClient) { }
 
   getDevice(): Observable<string> {
-    return this.httpServer.get<string>(`${this.url}/device`);
+    return this.httpServer.get<any>(`${this.url}/device`).pipe(map(device => device.deviceName));
   }
 
   getDevices(): Observable<string[]> {
@@ -44,7 +45,7 @@ export class ControlsService {
     return this.httpServer.post<void>(`${this.url}/go-to/${time}`, {});
   }
 
-  healthCheckDevice(device: string): Observable<boolean> {
-    return this.httpServer.get<boolean>(`${this.url}/health-check-device/${device}`);
+  healthCheckDevice(): Observable<string> {
+    return this.httpServer.get<any>(`${this.url}/health-check-device`).pipe(map(health => health.status));
   }
 }

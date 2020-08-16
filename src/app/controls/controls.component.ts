@@ -22,7 +22,7 @@ export class ControlsComponent implements OnInit {
   public isPaused = true;
   public isMute = false;
   public isFullscreen = false;
-  public isHealthy = true;
+  public deviceStatus: any;
   public currentTime = '00:00:00';
   public totalDuration = '00:00:00';
   public checkHealthUpdate: any;
@@ -38,8 +38,10 @@ export class ControlsComponent implements OnInit {
 
   ngOnInit(): void {
     this.controlsService.getDevice().subscribe((device) => {
+      console.log(device);
       if (device !== undefined) {
-        this.device = device;
+        this.selectDevice(device);
+        this.deviceEmit.emit(device);
       }
     });
 
@@ -83,16 +85,20 @@ export class ControlsComponent implements OnInit {
           data: devices
         });
         dialog.afterDismissed().subscribe(device => {
-          this.device = device;
           this.controlsService.chooseDevice(device).subscribe(() => this.deviceEmit.emit(device));
-          this.checkHealthUpdate = setInterval(() =>
-            this.controlsService.healthCheckDevice(device).subscribe(health => this.isHealthy = health), 1000);
+          this.selectDevice(device);
         });
       });
     } else {
       this.deviceEmit.emit();
       this.device = undefined;
     }
+  }
+
+  public selectDevice(device: string): void {
+    this.device = device;
+    this.checkHealthUpdate = setInterval(() =>
+      this.controlsService.healthCheckDevice().subscribe(health => this.deviceStatus = health), 5000);
   }
 
   public connected(): boolean {
@@ -136,9 +142,9 @@ export class ControlsComponent implements OnInit {
   }
 
   private setupTimer() {
-    setInterval(() => {
-      this.currentTime = this.connected() ? '--:--:--' : Time.timeToString(this.videoElement.currentTime);
-    }, 1000);
+    // setInterval(() => {
+    //   this.currentTime = this.connected() ? '--:--:--' : Time.timeToString(this.videoElement.currentTime);
+    // }, 1000);
   }
 
   private sendSubtitles(file: any) {
